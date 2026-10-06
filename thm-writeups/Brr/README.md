@@ -48,6 +48,7 @@ Key findings:
 | 5020 | unknown | Likely **Modbus TCP** (standard 502 remapped) |
 | 5901 | VNC     | Protocol 3.8 (VeNCrypt + VNC Auth)            |
 | 8080 | HTTP    | **ScadaBR CTF** - Apache Tomcat/Coyote 1.1    |
+
 The interesting targets are 8080 (SCADA HMI) and 5020 (OT protocol).
 
 ### Web Enumeration - ScadaBR
@@ -64,8 +65,6 @@ The ScadaBR login accepted the default credentials:
 
 - **Username:** `admin`
 - **Password:** `admin`
-
-After login, the interface exposes an `SQL` console and an `Import/Export` panel, both of which are powerful post-auth surfaces.
 
 After login, the interface exposes an `SQL` console and an `Import/Export` panel, both of which are powerful post-auth surfaces.
 
@@ -184,6 +183,7 @@ print(flag)
 | 98      | b    |         |                |
 | 117     | u    |         |                |
 | 115     | s    |         |                |
+
 **Result:**
 
 ![Flag](images/07-Flag.png)
