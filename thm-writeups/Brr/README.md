@@ -133,6 +133,9 @@ This is where the room forces a pivot back to the OT protocol layer.
 ---
 ## Pivot to Modbus (OT Protocol)
 
+### **What is Modbus?**
+Modbus is a 1979-era industrial protocol used by PLCs, sensors, and SCADA systems. It has no authentication or encryption, so anyone who can reach the port can read and write the device's registers. In this room, the flag was stored as ASCII values in holding registers, readable by any Modbus client.
+
 Revisiting the nmap scan, port `5020` stands out. The standard Modbus TCP port is `502`, so a remap to `5020` strongly suggests an OT service. If the flag is not on disk, it is likely in the industrial protocol itself.
 
 Using `pymodbus`:
