@@ -122,7 +122,7 @@ tomcat7@77f992b1ebf5:/var/lib/tomcat7/webapps/ScadaBR/resources$
 
 At this point we have RCE, but that is not the objective. The flag is not in the container. We confirm this with a targeted search:
 
-![Shell-1](images/05-shell-1.png)
+![Shell-1](images/05-Shell-1.png)
 
 ![shell-2](images/06-shell-2.png)
 
