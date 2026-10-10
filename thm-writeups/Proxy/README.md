@@ -104,9 +104,9 @@ Note on RDP: port 3389 is open, but RDP is not the attack path here. The room's 
 
 Note on SMB signing: the scan reports `Message signing enabled and required`. This rules out NTLM relay attacks against SMB on this host. It does not rule out credential capture. The scanner service we are about to abuse authenticates outbound to an attacker-controlled share, so the hash we capture can still be cracked offline. Signing only matters for relay, not for capture-and-crack.
 
-![[Nmap-1.png]]
+![Nmap-1](images/Nmap-1.png)
 
-![[Nmap-2.png]]
+![Nmap-2.png](images/Nmap-2.png)
 
 ---
 ### Step 2: SMB Enumeration
@@ -117,24 +117,24 @@ I attempted an anonymous SMB session and found the IT-Shared share was both read
 smbclient -L //10.114.148.221 -N
 ```
 
-![[smb.png]]
+![smb.png](images/smb.png)
 
 The share comment "IT Department Shared Resources" made it the obvious target. I connected and downloaded the three files inside.
 
-![[IT-Shared.png]]
+![IT-Shared.png](images/IT-Shared.png)
 
 ---
 ### Step 3: Reading the Intel
 
 The credentials file looked promising at first:
 
-![[IT-Credentials.png]]
+![IT-Credentials.png](images/IT-Credentials.png)
 
 Both accounts are explicitly marked disabled. This is a decoy. Trying them wastes time.
 
 The onboarding checklist was the real prize:
 
-![[IT-Onboarding.png]]
+![IT-Onboarding.png](images/IT-Onboarding.png)
 
 Three key facts:
 
@@ -174,7 +174,7 @@ Uploaded as `intercept.ps1` to IT-Shared. Within the two-minute window, Responde
 
 Note on a common blocker: if your attacking machine already has smbd running on port 445, Responder will not receive the connection. Kill anything on that port before starting Responder. This took me a while to spot because the symptom looks identical to "wrong payload."
 
-![[Responder-capture.png]]
+![Responder-capture.png](images/Responder-capture.png)
 
 ---
 ### Step 5: Cracking the Hash
@@ -191,7 +191,7 @@ Result:
 svc.scanner:1summerlove!
 ```
 
-![[hash-cracking.png]]
+![hash-cracking.png](images/hash-cracking.png)
 
 ---
 ### Step 6: Enumerating Delegation
@@ -212,7 +212,7 @@ svc.scanner   Person        Constrained w/ Protocol Transition cifs/DC01.ctf.loc
 
 There it is. The account has Constrained Delegation with Protocol Transition. This means the account can use S4U2Self to obtain a service ticket on behalf of any user without knowing their password, then S4U2Proxy to forward that ticket to the allowed service. The allowed service is `cifs` on the Domain Controller itself.
 
-![[find-Delegation-Output.png]]
+![find-Delegation-Output.png](images/find-Delegation-Output.png)
 
 ---
 ### Step 7: Requesting the Impersonation Ticket
@@ -235,7 +235,7 @@ Output :
 
 I now hold a Kerberos ticket that says I am the Administrator and that I am authorized to access CIFS on DC01.
 
-![[getST-success.png]]
+![getST-success.png](images/getST-success.png)
 
 ---
 ### Step 8: Using the Ticket
@@ -257,11 +257,11 @@ Inside the Impacket smbclient prompt, I listed shares and entered C$:
 # get flag.txt
 ```
 
-![[accessing-ticket.png]]
+![accessing-ticket.png](images/accessing-ticket.png)
 
 The flag file was sitting on the Administrator's desktop.
 
-![[getting-flag.png]]
+![getting-flag.png](images/getting-flag.png)
 
 ---
 ## Lessons Learned
